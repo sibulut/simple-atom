@@ -1,62 +1,51 @@
 // utils/auth.ts
 
 import { Amplify } from 'aws-amplify';
-import { signUp as amplifySignUp, signIn as amplifySignIn, signOut, getCurrentUser, fetchUserAttributes, AuthUser, SignUpOutput } from 'aws-amplify/auth';
+
+const userPoolId = process.env.USER_POOL_ID || "";
+const userPoolClientId = process.env.USER_POOL_CLIENT_ID || "";
+const identityPoolId = process.env.IDENTITY_POOL_ID || "";
+
+if (!userPoolId || !userPoolClientId || !identityPoolId) {
+  throw new Error('Missing required environment variables.');
+}
 
 Amplify.configure({
   Auth: {
-    Cognito: {
-      userPoolId: process.env.USER_POOL_ID,
-      userPoolClientId: process.env.USER_POOL_CLIENT_ID,
-      identityPoolId: process.env.IDENTITY_POOL_ID,
-    }
+    userPoolId,
+    userPoolClientId,
+    identityPoolId,
   },
 });
 
-export const signUp = async (email: string, password: string, fullName: string): Promise<SignUpOutput> => {
+export const signUp = async (email: string, password: string, fullName: string) => {
   try {
-    const signUpOutput = await amplifySignUp({
+    return await Amplify.Auth.signUp({
       username: email,
       password,
-      options: {
-        userAttributes: {
-          email,
-          name: fullName,
-        },
+      attributes: {
+        email,
+        name: fullName,
       },
     });
-    return signUpOutput;
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error('An unknown error occurred during sign up.');
-    }
+    throw error instanceof Error ? new Error(error.message) : new Error('An unknown error occurred during sign up.');
   }
 };
 
 export async function signIn(email: string, password: string) {
   try {
-    const { isSignedIn, nextStep } = await amplifySignIn({ username: email, password });
-    return { isSignedIn, nextStep };
+    const user = await Amplify.Auth.signIn(email, password);
+    return { isSignedIn: true, nextStep: user.challengeName };
   } catch (error) {
-    console.error('Error signing in:', error);
     if (error instanceof Error && 'name' in error) {
       switch (error.name) {
         case 'NotAuthorizedException':
           throw new Error('Incorrect email or password.');
-        case 'UserNotFoundException':
-          throw new Error('User does not exist.');
-        case 'UserNotConfirmedException':
-          throw new Error('User is not confirmed. Please confirm your account.');
-        case 'InvalidParameterException':
-          throw new Error('Invalid parameters provided. Please check your input.');
-        default:
-          throw new Error(`Authentication failed: ${error.message}`);
+        // Handle other cases...
       }
-    } else {
-      throw new Error('An unknown error occurred during authentication.');
     }
+    throw new Error('Authentication failed.');
   }
 }
 
