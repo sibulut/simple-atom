@@ -6,8 +6,12 @@ const userPoolId = process.env.USER_POOL_ID || "";
 const userPoolClientId = process.env.USER_POOL_CLIENT_ID || "";
 const identityPoolId = process.env.IDENTITY_POOL_ID || "";
 
-if (!userPoolId || !userPoolClientId || !identityPoolId) {
-  throw new Error('Missing required environment variables.');
+const missingVars = [];
+if (!userPoolId) missingVars.push('USER_POOL_ID');
+if (!userPoolClientId) missingVars.push('USER_POOL_CLIENT_ID');
+if (!identityPoolId) missingVars.push('IDENTITY_POOL_ID');
+if (missingVars.length) {
+  throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
 }
 
 Amplify.configure({
@@ -33,7 +37,7 @@ export const signUp = async (email: string, password: string, fullName: string) 
   }
 };
 
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, password: string): Promise<{ isSignedIn: boolean; nextStep?: string }> {
   try {
     const user = await Amplify.Auth.signIn(email, password);
     return { isSignedIn: true, nextStep: user.challengeName };
@@ -42,42 +46,41 @@ export async function signIn(email: string, password: string) {
       switch (error.name) {
         case 'NotAuthorizedException':
           throw new Error('Incorrect email or password.');
-        // Handle other cases...
+        case 'UserNotFoundException':
+          throw new Error('User does not exist.');
+        case 'UserNotConfirmedException':
+          throw new Error('User is not confirmed. Please confirm your account.');
+        default:
+          throw new Error(`Authentication failed: ${error.message}`);
       }
     }
     throw new Error('Authentication failed.');
   }
 }
 
-export async function signOutUser() {
+export async function signOutUser(): Promise<void> {
   try {
-    await signOut();
+    await Amplify.Auth.signOut();
   } catch (error) {
     console.error('Error signing out:', error);
-    if (error instanceof Error) {
-      throw new Error(`Sign out failed: ${error.message}`, { cause: error });
-    } else {
-      throw new Error('An unknown error occurred during sign out.');
-    }
+    throw error instanceof Error ? new Error(`Sign out failed: ${error.message}`) : new Error('An unknown error occurred during sign out.');
   }
 }
 
 export async function getCurrentAuthenticatedUser() {
   try {
-    const user = await getCurrentUser();
-    const attributes = await fetchUserAttributes();
+    const user = await Amplify.Auth.currentAuthenticatedUser();
+    const attributes = await Amplify.Auth.userAttributes(user);
+    const attributeMap = attributes.reduce((acc, { Name, Value }) => ({ ...acc, [Name]: Value }), {});
+
     return {
       username: user.username,
-      userId: user.userId,
-      fullName: attributes.name || user.username,
-      email: attributes.email || user.username,
+      userId: user.attributes.sub,
+      fullName: attributeMap.name || user.username,
+      email: attributeMap.email || user.username,
     };
   } catch (error) {
     console.error('Error getting current user:', error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to get current user: ${error.message}`, { cause: error });
-    } else {
-      throw new Error('An unknown error occurred while getting the current user.');
-    }
+    throw error instanceof Error ? new Error(`Failed to get current user: ${error.message}`) : new Error('An unknown error occurred while getting the current user.');
   }
 }
