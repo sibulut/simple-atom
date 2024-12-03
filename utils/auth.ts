@@ -1,7 +1,6 @@
-// utils/auth.ts
-
 import { Amplify } from 'aws-amplify';
 import { cognitoUserPoolsTokenProvider } from '@aws-amplify/auth/cognito';
+import { SignUpOutput } from '@aws-amplify/auth';
 
 const userPoolId = process.env.USER_POOL_ID || '';
 const userPoolClientId = process.env.USER_POOL_CLIENT_ID || '';
@@ -17,9 +16,11 @@ Amplify.configure({
   },
 });
 
-export const signUp = async (email: string, password: string, fullName: string) => {
+export { SignUpOutput };
+
+export const signUp = async (email: string, password: string, fullName: string): Promise<SignUpOutput> => {
   try {
-    const { userId, isSignUpComplete, nextStep } = await Amplify.Auth.signUp({
+    const signUpOutput = await Amplify.Auth.signUp({
       username: email,
       password,
       options: {
@@ -29,7 +30,7 @@ export const signUp = async (email: string, password: string, fullName: string) 
         },
       },
     });
-    return { userId, isSignUpComplete, nextStep };
+    return signUpOutput;
   } catch (error) {
     throw error instanceof Error ? new Error(error.message) : new Error('An unknown error occurred during sign up.');
   }
