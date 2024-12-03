@@ -1,8 +1,8 @@
 // utils/auth.ts
 
 import { Amplify } from 'aws-amplify';
-import { cognitoUserPoolsTokenProvider } from '@aws-amplify/auth/cognito';
-import { signUp as amplifySignUp, SignUpOutput } from '@aws-amplify/auth';
+import { signUp as amplifySignUp, signIn as amplifySignIn, signOut as amplifySignOut, getCurrentUser, fetchUserAttributes } from '@aws-amplify/auth';
+import { type SignUpOutput } from '@aws-amplify/auth';
 
 const userPoolId = process.env.USER_POOL_ID || '';
 const userPoolClientId = process.env.USER_POOL_CLIENT_ID || '';
@@ -40,7 +40,7 @@ export const signUp = async (email: string, password: string, fullName: string):
 
 export async function signIn(email: string, password: string): Promise<{ isSignedIn: boolean; nextStep?: string }> {
   try {
-    const { isSignedIn, nextStep } = await Amplify.Auth.signIn({ username: email, password });
+    const { isSignedIn, nextStep } = await amplifySignIn({ username: email, password });
     return { isSignedIn, nextStep };
   } catch (error) {
     if (error instanceof Error && 'name' in error) {
@@ -61,7 +61,7 @@ export async function signIn(email: string, password: string): Promise<{ isSigne
 
 export async function signOutUser(): Promise<void> {
   try {
-    await Amplify.Auth.signOut();
+    await amplifySignOut();
   } catch (error) {
     console.error('Error signing out:', error);
     throw error instanceof Error ? new Error(`Sign out failed: ${error.message}`) : new Error('An unknown error occurred during sign out.');
@@ -70,15 +70,14 @@ export async function signOutUser(): Promise<void> {
 
 export async function getCurrentAuthenticatedUser() {
   try {
-    const { username, userId, signInDetails } = await Amplify.Auth.getCurrentUser();
-    const attributes = await cognitoUserPoolsTokenProvider.getTokens();
-    const attributeMap = attributes.accessToken.payload;
-
+    const { username, userId } = await getCurrentUser();
+    const attributes = await fetchUserAttributes();
+    
     return {
       username,
       userId,
-      fullName: attributeMap.name || username,
-      email: attributeMap.email || username,
+      fullName: attributes.name || username,
+      email: attributes.email || username,
     };
   } catch (error) {
     console.error('Error getting current user:', error);
