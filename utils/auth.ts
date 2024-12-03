@@ -41,7 +41,8 @@ export const signUp = async (email: string, password: string, fullName: string):
 export async function signIn(email: string, password: string): Promise<{ isSignedIn: boolean; nextStep?: string }> {
   try {
     const { isSignedIn, nextStep } = await amplifySignIn({ username: email, password });
-    return { isSignedIn, nextStep };
+    const nextStepString = typeof nextStep === 'string' ? nextStep : nextStep?.toString();
+    return { isSignedIn, nextStep: nextStepString };
   } catch (error) {
     if (error instanceof Error && 'name' in error) {
       switch (error.name) {
