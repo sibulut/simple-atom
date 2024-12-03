@@ -1,5 +1,9 @@
+// app/page.tsx
+
 import Image from "next/image";
 import Link from "next/link";
+
+require('dotenv').config({ path: '.env.production' });
 
 export default function Home() {
   return (

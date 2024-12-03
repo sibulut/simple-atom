@@ -1,6 +1,8 @@
-// pages/videos.tsx
+// app/videos.tsx
 
 'use client'
+
+require('dotenv').config({ path: '.env.production' });
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'

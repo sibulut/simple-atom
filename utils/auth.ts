@@ -1,5 +1,7 @@
 // utils/auth.ts
 
+require('dotenv').config({ path: '.env.production' });
+
 import { Amplify } from 'aws-amplify';
 import { signUp as amplifySignUp, signIn as amplifySignIn, signOut as amplifySignOut, getCurrentUser, fetchUserAttributes } from '@aws-amplify/auth';
 import { type SignUpOutput } from '@aws-amplify/auth';
