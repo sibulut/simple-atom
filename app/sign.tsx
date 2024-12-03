@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn, signUp, signOutUser, getCurrentAuthenticatedUser, SignUpOutput } from '../utils/auth';
+import { signIn, signUp, signOutUser, getCurrentAuthenticatedUser, type SignUpOutput } from '../utils/auth';
 import { getUserMetadata, updateUserMetadata } from '../utils/dynamodb';
 
 export default function Auth() {

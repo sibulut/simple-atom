@@ -1,6 +1,8 @@
+// utils/auth.ts
+
 import { Amplify } from 'aws-amplify';
 import { cognitoUserPoolsTokenProvider } from '@aws-amplify/auth/cognito';
-import { SignUpOutput } from '@aws-amplify/auth';
+import { signUp as amplifySignUp, SignUpOutput } from '@aws-amplify/auth';
 
 const userPoolId = process.env.USER_POOL_ID || '';
 const userPoolClientId = process.env.USER_POOL_CLIENT_ID || '';
@@ -16,11 +18,11 @@ Amplify.configure({
   },
 });
 
-export { SignUpOutput };
+export type { SignUpOutput };
 
 export const signUp = async (email: string, password: string, fullName: string): Promise<SignUpOutput> => {
   try {
-    const signUpOutput = await Amplify.Auth.signUp({
+    const signUpOutput = await amplifySignUp({
       username: email,
       password,
       options: {
