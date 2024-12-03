@@ -8,7 +8,7 @@ import { Amplify } from 'aws-amplify';
 import { signUp as amplifySignUp, signIn as amplifySignIn, signOut as amplifySignOut, getCurrentUser, fetchUserAttributes } from '@aws-amplify/auth';
 import { type SignUpOutput } from '@aws-amplify/auth';
 
-const userPoolId = process.env.USER_POOL_ID;
+const userPoolId = process.env.USER_POOL_ID || "us-west-1_JFYogeWyV";
 const userPoolClientId = process.env.USER_POOL_CLIENT_ID;
 const identityPoolId = process.env.IDENTITY_POOL_ID;
 
