@@ -8,9 +8,9 @@ import { Amplify } from 'aws-amplify';
 import { signUp as amplifySignUp, signIn as amplifySignIn, signOut as amplifySignOut, getCurrentUser, fetchUserAttributes } from '@aws-amplify/auth';
 import { type SignUpOutput } from '@aws-amplify/auth';
 
-const userPoolId = process.env.USER_POOL_ID;
-const userPoolClientId = process.env.USER_POOL_CLIENT_ID;
-const identityPoolId = process.env.IDENTITY_POOL_ID;
+const userPoolId = process.env.USER_POOL_ID || "us-west-1_JFYogeWyV";
+const userPoolClientId = process.env.USER_POOL_CLIENT_ID || "4tu1jhb0bo762g1k5ra5l1e40p";
+const identityPoolId = process.env.IDENTITY_POOL_ID || "us-west-1:f321bc60-ae42-4d1b-a9a1-e684e4bca005";
 
 if (!userPoolId) {
     throw new Error('Missing required AWS configuration environment variable: USER_POOL_ID.');
