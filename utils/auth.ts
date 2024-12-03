@@ -1,7 +1,7 @@
 // utils/auth.ts
 
 if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({ path: '.env.production' });
+  require('dotenv').config();
 }
 
 import { Amplify } from 'aws-amplify';
