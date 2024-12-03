@@ -32,6 +32,11 @@ Amplify.configure({
   },
 });
 
+// Log the environment variables, REMOVE THIS AFTER TESTING
+console.log('USER_POOL_ID:', process.env.USER_POOL_ID);
+console.log('USER_POOL_CLIENT_ID:', process.env.USER_POOL_CLIENT_ID);
+console.log('IDENTITY_POOL_ID:', process.env.IDENTITY_POOL_ID);
+
 export type { SignUpOutput };
 
 export const signUp = async (email: string, password: string, fullName: string): Promise<SignUpOutput> => {
