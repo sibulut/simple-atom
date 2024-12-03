@@ -1,10 +1,11 @@
+// app/sign.tsx
+
 'use client'
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, signUp, signOutUser, getCurrentAuthenticatedUser } from '../utils/auth';
 import { getUserMetadata, updateUserMetadata } from '../utils/dynamodb';
-import { SignUpOutput } from 'aws-amplify/auth';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);

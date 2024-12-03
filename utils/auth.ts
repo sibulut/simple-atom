@@ -1,10 +1,11 @@
 // utils/auth.ts
 
-import Amplify from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
+import { cognitoUserPoolsTokenProvider } from '@aws-amplify/auth/cognito';
 
-const userPoolId = 'USER_POOL_ID';
-const userPoolClientId = 'USER_POOL_CLIENT_ID';
-const identityPoolId = 'IDENTITY_POOL_ID';
+const userPoolId = process.env.USER_POOL_ID || '';
+const userPoolClientId = process.env.USER_POOL_CLIENT_ID || '';
+const identityPoolId = process.env.IDENTITY_POOL_ID || '';
 
 Amplify.configure({
   Auth: {
@@ -18,14 +19,17 @@ Amplify.configure({
 
 export const signUp = async (email: string, password: string, fullName: string) => {
   try {
-    return await Amplify.Auth.signUp({
+    const { userId, isSignUpComplete, nextStep } = await Amplify.Auth.signUp({
       username: email,
       password,
-      attributes: {
-        email,
-        name: fullName,
+      options: {
+        userAttributes: {
+          email,
+          name: fullName,
+        },
       },
     });
+    return { userId, isSignUpComplete, nextStep };
   } catch (error) {
     throw error instanceof Error ? new Error(error.message) : new Error('An unknown error occurred during sign up.');
   }
@@ -33,8 +37,8 @@ export const signUp = async (email: string, password: string, fullName: string) 
 
 export async function signIn(email: string, password: string): Promise<{ isSignedIn: boolean; nextStep?: string }> {
   try {
-    const user = await Amplify.Auth.signIn(email, password);
-    return { isSignedIn: true, nextStep: user.challengeName };
+    const { isSignedIn, nextStep } = await Amplify.Auth.signIn({ username: email, password });
+    return { isSignedIn, nextStep };
   } catch (error) {
     if (error instanceof Error && 'name' in error) {
       switch (error.name) {
@@ -63,15 +67,15 @@ export async function signOutUser(): Promise<void> {
 
 export async function getCurrentAuthenticatedUser() {
   try {
-    const user = await Amplify.Auth.currentAuthenticatedUser();
-    const attributes = await Amplify.Auth.userAttributes(user);
-    const attributeMap = attributes.reduce((acc, { Name, Value }) => ({ ...acc, [Name]: Value }), {});
+    const { username, userId, signInDetails } = await Amplify.Auth.getCurrentUser();
+    const attributes = await cognitoUserPoolsTokenProvider.getTokens();
+    const attributeMap = attributes.accessToken.payload;
 
     return {
-      username: user.username,
-      userId: user.attributes.sub,
-      fullName: attributeMap.name || user.username,
-      email: attributeMap.email || user.username,
+      username,
+      userId,
+      fullName: attributeMap.name || username,
+      email: attributeMap.email || username,
     };
   } catch (error) {
     console.error('Error getting current user:', error);
