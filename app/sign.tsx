@@ -2,8 +2,6 @@
 
 'use client'
 
-require('dotenv').config({ path: '.env.production' });
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, signUp, signOutUser, getCurrentAuthenticatedUser, type SignUpOutput } from '../utils/auth';

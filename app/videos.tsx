@@ -2,8 +2,6 @@
 
 'use client'
 
-require('dotenv').config({ path: '.env.production' });
-
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentAuthenticatedUser } from '../utils/auth'
