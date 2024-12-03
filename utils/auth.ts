@@ -1,24 +1,18 @@
 // utils/auth.ts
 
-import { Amplify } from 'aws-amplify';
+import Amplify from 'aws-amplify';
 
-const userPoolId = process.env.USER_POOL_ID || "";
-const userPoolClientId = process.env.USER_POOL_CLIENT_ID || "";
-const identityPoolId = process.env.IDENTITY_POOL_ID || "";
-
-const missingVars = [];
-if (!userPoolId) missingVars.push('USER_POOL_ID');
-if (!userPoolClientId) missingVars.push('USER_POOL_CLIENT_ID');
-if (!identityPoolId) missingVars.push('IDENTITY_POOL_ID');
-if (missingVars.length) {
-  throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
-}
+const userPoolId = 'USER_POOL_ID';
+const userPoolClientId = 'USER_POOL_CLIENT_ID';
+const identityPoolId = 'IDENTITY_POOL_ID';
 
 Amplify.configure({
   Auth: {
-    userPoolId,
-    userPoolClientId,
-    identityPoolId,
+    Cognito: {
+      userPoolId,
+      userPoolClientId,
+      identityPoolId,
+    },
   },
 });
 
