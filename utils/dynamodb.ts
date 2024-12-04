@@ -7,18 +7,18 @@ if (process.env.NODE_ENV !== 'production') {
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
-const region = process.env.APP_REGION;
-const accessKeyId = process.env.APP_ACCESS_KEY_ID;
-const secretAccessKey = process.env.APP_SECRET_ACCESS_KEY;
+const region = process.env.NEXT_PUBLIC_APP_REGION;
+const accessKeyId = process.env.NEXT_PUBLIC_APP_ACCESS_KEY_ID;
+const secretAccessKey = process.env.NEXT_PUBLIC_APP_SECRET_ACCESS_KEY;
 
 if (!region) {
-    throw new Error('Missing required AWS configuration environment variable: APP_REGION.');
+    throw new Error('Missing AWS environment variable: APP_REGION.');
 }
 if (!accessKeyId) {
-    throw new Error('Missing required AWS configuration environment variable: APP_ACCESS_KEY_ID.');
+    throw new Error('Missing AWS environment variable: APP_ACCESS_KEY_ID.');
 }
 if (!secretAccessKey) {
-    throw new Error('Missing required AWS configuration environment variable: APP_SECRET_ACCESS_KEY.');
+    throw new Error('Missing AWS environment variable: APP_SECRET_ACCESS_KEY.');
 }
 
 const client = new DynamoDBClient({
@@ -31,7 +31,7 @@ const client = new DynamoDBClient({
 
 const docClient = DynamoDBDocumentClient.from(client);
 
-const TABLE_NAME = process.env.DYNAMODB_TABLE_NAME;
+const TABLE_NAME = process.env.NEXT_PUBLIC_DYNAMODB_TABLE_NAME;
 
 export type UserMetadata = {
   id: string;

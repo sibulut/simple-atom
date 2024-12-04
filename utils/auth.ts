@@ -13,13 +13,13 @@ const userPoolClientId = process.env.NEXT_PUBLIC_USER_POOL_CLIENT_ID;
 const identityPoolId = process.env.NEXT_PUBLIC_IDENTITY_POOL_ID;
 
 if (!userPoolId) {
-    throw new Error('Missing required AWS configuration environment variable: USER_POOL_ID.');
+    throw new Error('Missing AWS environment variable: USER_POOL_ID.');
 }
 if (!userPoolClientId) {
-    throw new Error('Missing required AWS configuration environment variable: USER_POOL_CLIENT_ID.');
+    throw new Error('Missing AWS environment variable: USER_POOL_CLIENT_ID.');
 }
 if (!identityPoolId) {
-    throw new Error('Missing required AWS configuration environment variable: IDENTITY_POOL_ID.');
+    throw new Error('Missing AWS environment variable: IDENTITY_POOL_ID.');
 }
 
 Amplify.configure({
