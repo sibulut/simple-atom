@@ -12,6 +12,8 @@ const userPoolId = process.env.USER_POOL_ID;
 const userPoolClientId = process.env.USER_POOL_CLIENT_ID;
 const identityPoolId = process.env.IDENTITY_POOL_ID;
 
+console.log({ userPoolId, userPoolClientId, identityPoolId });
+
 if (!userPoolId) {
     throw new Error('Missing required AWS configuration environment variable: USER_POOL_ID.');
 }
